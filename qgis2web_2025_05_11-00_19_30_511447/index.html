@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/MarkerCluster.css">
+        <link rel="stylesheet" href="css/MarkerCluster.Default.css">
+        <link rel="stylesheet" href="css/leaflet-search.css">
+        <style>
+        #map {
+            width: 1316px;
+            height: 883px;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.markercluster.js"></script>
+        <script src="js/leaflet-search.js"></script>
+        <script src="data/gunungkidulBatasKecamatan_1.js"></script>
+        <script src="data/gunungkidulJaringanJalan_2.js"></script>
+        <script src="data/gunungkidulLokasiWisata_3.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[-8.245217733859338,110.27311243427296],[-7.7887350161671165,110.95395044908294]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_gunungkidulBatasKecamatan_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Kecamatan</th>\
+                        <td class="visible-with-data" id="Kecamatan">' + (feature.properties['Kecamatan'] !== null ? autolinker.link(String(feature.properties['Kecamatan']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Kabupaten</th>\
+                        <td class="visible-with-data" id="Kabupaten">' + (feature.properties['Kabupaten'] !== null ? autolinker.link(String(feature.properties['Kabupaten']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Provinsi</th>\
+                        <td class="visible-with-data" id="Provinsi">' + (feature.properties['Provinsi'] !== null ? autolinker.link(String(feature.properties['Provinsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_gunungkidulBatasKecamatan_1_0() {
+            return {
+                pane: 'pane_gunungkidulBatasKecamatan_1',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_gunungkidulBatasKecamatan_1');
+        map.getPane('pane_gunungkidulBatasKecamatan_1').style.zIndex = 401;
+        map.getPane('pane_gunungkidulBatasKecamatan_1').style['mix-blend-mode'] = 'normal';
+        var layer_gunungkidulBatasKecamatan_1 = new L.geoJson(json_gunungkidulBatasKecamatan_1, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_gunungkidulBatasKecamatan_1',
+            layerName: 'layer_gunungkidulBatasKecamatan_1',
+            pane: 'pane_gunungkidulBatasKecamatan_1',
+            onEachFeature: pop_gunungkidulBatasKecamatan_1,
+            style: style_gunungkidulBatasKecamatan_1_0,
+        });
+        bounds_group.addLayer(layer_gunungkidulBatasKecamatan_1);
+        map.addLayer(layer_gunungkidulBatasKecamatan_1);
+        function pop_gunungkidulJaringanJalan_2(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Status</th>\
+                        <td class="visible-with-data" id="Status">' + (feature.properties['Status'] !== null ? autolinker.link(String(feature.properties['Status']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Fungsi</th>\
+                        <td class="visible-with-data" id="Fungsi">' + (feature.properties['Fungsi'] !== null ? autolinker.link(String(feature.properties['Fungsi']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Panjang_Km</th>\
+                        <td class="visible-with-data" id="Panjang_Km">' + (feature.properties['Panjang_Km'] !== null ? autolinker.link(String(feature.properties['Panjang_Km']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_gunungkidulJaringanJalan_2_0() {
+            return {
+                pane: 'pane_gunungkidulJaringanJalan_2',
+                opacity: 1,
+                color: 'rgba(225,89,137,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 1.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+        }
+        map.createPane('pane_gunungkidulJaringanJalan_2');
+        map.getPane('pane_gunungkidulJaringanJalan_2').style.zIndex = 402;
+        map.getPane('pane_gunungkidulJaringanJalan_2').style['mix-blend-mode'] = 'normal';
+        var layer_gunungkidulJaringanJalan_2 = new L.geoJson(json_gunungkidulJaringanJalan_2, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_gunungkidulJaringanJalan_2',
+            layerName: 'layer_gunungkidulJaringanJalan_2',
+            pane: 'pane_gunungkidulJaringanJalan_2',
+            onEachFeature: pop_gunungkidulJaringanJalan_2,
+            style: style_gunungkidulJaringanJalan_2_0,
+        });
+        bounds_group.addLayer(layer_gunungkidulJaringanJalan_2);
+        map.addLayer(layer_gunungkidulJaringanJalan_2);
+        function pop_gunungkidulLokasiWisata_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Wisata</th>\
+                        <td class="visible-with-data" id="Wisata">' + (feature.properties['Wisata'] !== null ? autolinker.link(String(feature.properties['Wisata']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Kab_Kota</th>\
+                        <td class="visible-with-data" id="Kab_Kota">' + (feature.properties['Kab_Kota'] !== null ? autolinker.link(String(feature.properties['Kab_Kota']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_gunungkidulLokasiWisata_3_0() {
+            return {
+                pane: 'pane_gunungkidulLokasiWisata_3',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/gunungkidulLokasiWisata_3.svg',
+            iconSize: [31.159999999999997, 31.159999999999997]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_gunungkidulLokasiWisata_3');
+        map.getPane('pane_gunungkidulLokasiWisata_3').style.zIndex = 403;
+        map.getPane('pane_gunungkidulLokasiWisata_3').style['mix-blend-mode'] = 'normal';
+        var layer_gunungkidulLokasiWisata_3 = new L.geoJson(json_gunungkidulLokasiWisata_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_gunungkidulLokasiWisata_3',
+            layerName: 'layer_gunungkidulLokasiWisata_3',
+            pane: 'pane_gunungkidulLokasiWisata_3',
+            onEachFeature: pop_gunungkidulLokasiWisata_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_gunungkidulLokasiWisata_3_0(feature));
+            },
+        });
+        var cluster_gunungkidulLokasiWisata_3 = new L.MarkerClusterGroup({showCoverageOnHover: false,
+            spiderfyDistanceMultiplier: 2});
+        cluster_gunungkidulLokasiWisata_3.addLayer(layer_gunungkidulLokasiWisata_3);
+
+        bounds_group.addLayer(layer_gunungkidulLokasiWisata_3);
+        cluster_gunungkidulLokasiWisata_3.addTo(map);
+        var overlaysTree = [
+            {label: '<img src="legend/gunungkidulLokasiWisata_3.png" /> gunungkidul — Lokasi Wisata', layer: cluster_gunungkidulLokasiWisata_3},
+            {label: '<img src="legend/gunungkidulJaringanJalan_2.png" /> gunungkidul — Jaringan Jalan', layer: layer_gunungkidulJaringanJalan_2},
+            {label: '<img src="legend/gunungkidulBatasKecamatan_1.png" /> gunungkidul — Batas Kecamatan', layer: layer_gunungkidulBatasKecamatan_1},
+            {label: "OSM Standard", layer: layer_OSMStandard_0},]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        setBounds();
+        var i = 0;
+        layer_gunungkidulBatasKecamatan_1.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Kecamatan'] !== null?String('<div style="color: #323232; font-size: 15pt; font-weight: bold; font-style: italic; font-family: \'Times New Roman\', sans-serif;">' + layer.feature.properties['Kecamatan']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_gunungkidulBatasKecamatan_1'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        var i = 0;
+        layer_gunungkidulLokasiWisata_3.eachLayer(function(layer) {
+            var context = {
+                feature: layer.feature,
+                variables: {}
+            };
+            layer.bindTooltip((layer.feature.properties['Wisata'] !== null?String('<div style="color: #323232; font-size: 10pt; font-family: \'Times New Roman\', sans-serif;">' + layer.feature.properties['Wisata']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_gunungkidulLokasiWisata_3'});
+            labels.push(layer);
+            totalMarkers += 1;
+              layer.added = true;
+              addLabel(layer, i);
+              i++;
+        });
+        map.addControl(new L.Control.Search({
+            layer: cluster_gunungkidulLokasiWisata_3,
+            initial: false,
+            hideMarkerOnCollapse: true,
+            propertyName: 'Wisata'}));
+        document.getElementsByClassName('search-button')[0].className +=
+         ' fa fa-binoculars';
+        resetLabels([layer_gunungkidulBatasKecamatan_1,layer_gunungkidulLokasiWisata_3]);
+        map.on("zoomend", function(){
+            resetLabels([layer_gunungkidulBatasKecamatan_1,layer_gunungkidulLokasiWisata_3]);
+        });
+        map.on("layeradd", function(){
+            resetLabels([layer_gunungkidulBatasKecamatan_1,layer_gunungkidulLokasiWisata_3]);
+        });
+        map.on("layerremove", function(){
+            resetLabels([layer_gunungkidulBatasKecamatan_1,layer_gunungkidulLokasiWisata_3]);
+        });
+        </script>
+    </body>
+</html>
